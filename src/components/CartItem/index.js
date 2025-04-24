@@ -29,7 +29,7 @@ const CartItem = props => (
 
       return (
         <>
-          <li className="cart-item" testid="cartItem">
+          <li className="cart-item">
             <img className="cart-product-image" src={imageUrl} alt={name} />
             <div className="cart-items-details">
               <h1 className="cart-product-title">{name}</h1>
@@ -37,18 +37,14 @@ const CartItem = props => (
                 <button
                   type="button"
                   className="quantity-controller-button"
-                  testid="decrement-quantity"
                   onClick={decreaseQuantity}
                 >
                   <BsDashSquare color="#52606D" size={12} />
                 </button>
-                <p className="cart-quantity" testid="item-quantity">
-                  {quantity}
-                </p>
+                <p className="cart-quantity">{quantity}</p>
                 <button
                   type="button"
                   className="quantity-controller-button"
-                  testid="increment-quantity"
                   onClick={increaseQuantity}
                 >
                   <BsPlusSquare color="#52606D" size={12} />
@@ -68,7 +64,6 @@ const CartItem = props => (
                   className="delete-button"
                   type="button"
                   onClick={onClickRemoveCartItem}
-                  testid="remove"
                 >
                   <AiFillCloseCircle color="#616E7C" size={20} />
                 </button>

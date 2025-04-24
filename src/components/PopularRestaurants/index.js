@@ -38,7 +38,14 @@ class PopularRestaurants extends Component {
   }
 
   onChangeSearchInput = searchInput => {
-    this.setState({searchInput})
+    this.setState({searchInput, activePage: 1}, this.getRestaurants)
+  }
+
+  scrollToBottom = () => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth',
+    })
   }
 
   getRestaurants = async () => {
@@ -67,11 +74,14 @@ class PopularRestaurants extends Component {
       rating: eachItem.user_rating.rating,
       totalReviews: eachItem.user_rating.total_reviews,
     }))
-    this.setState({
-      restaurantsList: updatedData,
-      isLoading: false,
-      totalPages,
-    })
+    this.setState(
+      {
+        restaurantsList: updatedData,
+        isLoading: false,
+        totalPages,
+      },
+      this.scrollToBottom,
+    )
   }
 
   updateOption = option => {
@@ -91,8 +101,8 @@ class PopularRestaurants extends Component {
   }
 
   incrementPage = () => {
-    const {activePage} = this.state
-    if (activePage < 4) {
+    const {activePage, totalPages} = this.state
+    if (activePage < totalPages) {
       this.setState(
         prevState => ({
           activePage: prevState.activePage + 1,
@@ -103,26 +113,11 @@ class PopularRestaurants extends Component {
   }
 
   renderPopularRestaurants = () => {
-    const {
-      restaurantsList,
-      sortOption,
-      activePage,
-      totalPages,
-      searchInput,
-    } = this.state
-    const searchResults = restaurantsList.filter(eachRestaurant =>
-      eachRestaurant.name.toLowerCase().includes(searchInput.toLowerCase()),
-    )
+    const {restaurantsList, activePage, totalPages} = this.state
+    const searchResults = restaurantsList
     const isTrue = searchResults.length > 0
     return (
       <div className="popular-restaurants">
-        <RestaurantsHeader
-          sortOption={sortOption}
-          sortByOptions={sortByOptions}
-          updateOption={this.updateOption}
-          searchInput={searchInput}
-          updateSearchInput={this.onChangeSearchInput}
-        />
         <hr className="hr-line" />
 
         <hr className="hr-line" />
@@ -142,13 +137,10 @@ class PopularRestaurants extends Component {
             type="button"
             className="pagination-button"
             onClick={this.decrementPage}
-            testid="pagination-left-button"
           >
             <RiArrowDropLeftLine size={20} color="red" />
           </button>
-          <p testid="active-page-number" className="page-count">
-            {activePage}
-          </p>
+          <p className="page-count">{activePage}</p>
           <span
             className="page-count"
             style={{marginLeft: '5px', marginRight: '5px'}}
@@ -160,7 +152,6 @@ class PopularRestaurants extends Component {
             type="button"
             className="pagination-button"
             onClick={this.incrementPage}
-            testid="pagination-right-button"
           >
             <RiArrowDropRightLine size={20} color="red" />
           </button>
@@ -170,14 +161,26 @@ class PopularRestaurants extends Component {
   }
 
   renderLoader = () => (
-    <div className="carousel-loader" testid="restaurants-list-loader">
+    <div className="carousel-loader">
       <Loader type="ThreeDots" color="#F7931E" height={50} width={50} />
     </div>
   )
 
   render() {
-    const {isLoading} = this.state
-    return isLoading ? this.renderLoader() : this.renderPopularRestaurants()
+    const {isLoading, sortOption, searchInput} = this.state
+
+    return (
+      <>
+        <RestaurantsHeader
+          sortOption={sortOption}
+          sortByOptions={sortByOptions}
+          updateOption={this.updateOption}
+          searchInput={searchInput}
+          updateSearchInput={this.onChangeSearchInput}
+        />
+        {isLoading ? this.renderLoader() : this.renderPopularRestaurants()}
+      </>
+    )
   }
 }
 

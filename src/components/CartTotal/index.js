@@ -26,7 +26,7 @@ const CartTotal = props => {
             <div className="cart-total-container">
               <h1 className="total-text">Order Total:</h1>
               <div className="total-container">
-                <p testid="total-price" className="total-price">
+                <p className="total-price">
                   <FaRupeeSign className="rupee-icon" /> {totalOrderCost}
                 </p>
                 <button
