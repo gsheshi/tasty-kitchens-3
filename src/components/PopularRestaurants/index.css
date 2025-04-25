@@ -9,7 +9,6 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: flex-start;
   justify-content: space-between;
 }
 
@@ -85,4 +84,8 @@
   color: #183b56;
   margin-bottom: 0px;
   text-shadow: 2px 2px 5px grey;
+}
+
+.carousel-loader {
+  height: 100vh;
 }

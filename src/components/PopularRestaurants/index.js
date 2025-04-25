@@ -1,14 +1,20 @@
-import {Component} from 'react'
+import {Component, createRef} from 'react'
 import {RiArrowDropLeftLine, RiArrowDropRightLine} from 'react-icons/ri'
-
 import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
+import styled from 'styled-components'
 
 import RestaurantsHeader from '../RestaurantsHeader'
-
 import RestaurantCard from '../RestaurantCard'
 
 import './index.css'
+
+const LoaderContainer = styled.div`
+  min-height: ${props => {
+    console.log(props)
+    return props.minHeight
+  }}px;
+`
 
 const sortByOptions = [
   {
@@ -31,21 +37,27 @@ class PopularRestaurants extends Component {
     sortOption: sortByOptions[1].value,
     totalPages: 0,
     searchInput: '',
+    minHeight: 0,
   }
+
+  myRef = createRef()
 
   componentDidMount() {
     this.getRestaurants()
+    this.setMinHeight()
+  }
+
+  setMinHeight = () => {
+    const minHeight = this.myRef.current.offsetHeight
+    this.setState({minHeight})
   }
 
   onChangeSearchInput = searchInput => {
     this.setState({searchInput, activePage: 1}, this.getRestaurants)
   }
 
-  scrollToBottom = () => {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: 'smooth',
-    })
+  scrollToPaginationCont = () => {
+    this.myRef.current.scrollIntoView()
   }
 
   getRestaurants = async () => {
@@ -63,7 +75,7 @@ class PopularRestaurants extends Component {
     }
     const response = await fetch(url, options)
     const data = await response.json()
-    console.log(data)
+    // console.log(data)
     const totalRestaurants = data.total
     const totalPages = Math.ceil(totalRestaurants / limit)
     const updatedData = data.restaurants.map(eachItem => ({
@@ -80,7 +92,14 @@ class PopularRestaurants extends Component {
         isLoading: false,
         totalPages,
       },
-      this.scrollToBottom,
+      () => {
+        requestAnimationFrame(() => {
+          if (this.myRef.current) {
+            const minHeight = this.myRef.current.offsetHeight
+            this.setState({minHeight})
+          }
+        })
+      },
     )
   }
 
@@ -95,7 +114,10 @@ class PopularRestaurants extends Component {
         prevState => ({
           activePage: prevState.activePage - 1,
         }),
-        this.getRestaurants,
+        () => {
+          this.getRestaurants()
+          this.scrollToPaginationCont()
+        },
       )
     }
   }
@@ -107,7 +129,10 @@ class PopularRestaurants extends Component {
         prevState => ({
           activePage: prevState.activePage + 1,
         }),
-        this.getRestaurants,
+        () => {
+          this.getRestaurants()
+          this.scrollToPaginationCont()
+        },
       )
     }
   }
@@ -117,7 +142,7 @@ class PopularRestaurants extends Component {
     const searchResults = restaurantsList
     const isTrue = searchResults.length > 0
     return (
-      <div className="popular-restaurants">
+      <div ref={this.myRef} className="popular-restaurants">
         <hr className="hr-line" />
 
         <hr className="hr-line" />
@@ -160,11 +185,14 @@ class PopularRestaurants extends Component {
     )
   }
 
-  renderLoader = () => (
-    <div className="carousel-loader">
-      <Loader type="ThreeDots" color="#F7931E" height={50} width={50} />
-    </div>
-  )
+  renderLoader = () => {
+    const {minHeight} = this.state
+    return (
+      <LoaderContainer minHeight={minHeight}>
+        <Loader type="ThreeDots" color="#F7931E" height={50} width={50} />
+      </LoaderContainer>
+    )
+  }
 
   render() {
     const {isLoading, sortOption, searchInput} = this.state
