@@ -84,9 +84,7 @@ The app must have the following functionalities
 - When the users enter invalid route in the URL then the Page not found Route should be displayed.
 
 </details>
-> Demo
->
-> Link: https://gstastykitchens.ccbp.tech/
+
 ### Quick Tips
 
 <details>
